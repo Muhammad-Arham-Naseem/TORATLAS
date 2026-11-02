@@ -1246,6 +1246,23 @@ function addBasicSword(group,opts){
  const grip=makeGrip(G,opts.gripRadius||.09,opts.wrap!==false);grip.position.x=-G/2;group.add(grip);
  const guard=makeGuard(opts.guardWidth||.56,.09,opts.guardStyle||'cross');guard.position.x=0;group.add(guard);
  const pom=makePommel(opts.pommel||'round');pom.position.x=-G-.09;group.add(pom);
+ // Small procedural geometry details enrich the demonstrative models without inventing inscriptions.
+ const collar=new THREE.Mesh(new THREE.CylinderGeometry((opts.gripRadius||.09)*1.17,(opts.gripRadius||.09)*1.17,.075,20),brassMaterial());
+ collar.rotation.z=Math.PI/2;collar.position.x=-.12;group.add(collar);
+ if((opts.curve||0)===0 && opts.tip!=='split'){
+   // Shallow central fuller/ridge on stylized straight blades (not a verified section).
+   const fuller=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,L*.62,8),darkMetal());
+   fuller.rotation.z=Math.PI/2;fuller.position.set(.08+L*.35,0,.083);group.add(fuller);
+ }
+ if(opts.wrap!==false){
+   const gripR=opts.gripRadius||.09;
+   for(let i=0;i<11;i++){
+     const segment=new THREE.Mesh(new THREE.BoxGeometry(.024,gripR*2.05,.017),i%2?brassMaterial():darkMetal());
+     segment.position.set(-G+.08+i*(G-.16)/10,0,gripR*.92);
+     segment.rotation.x=(i%2?-.42:.42);group.add(segment);
+   }
+ }
+
  const fullLength=L+G+.1;group.position.x=-(L-G)/2;
  group.scale.setScalar(3.9/fullLength);
  return group
@@ -1261,11 +1278,16 @@ function makeSword(type){
  }
  if(type==='katana'){
    const sword=addBasicSword(group,{bladeLength:3.05,bladeWidth:.25,curve:.23,gripLength:1.18,gripRadius:.072,guardWidth:.47,guardStyle:'disc',pommel:'cap'});
-   const tsuba=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.035,32),darkMetal());tsuba.rotation.z=Math.PI/2;tsuba.position.x=0;sword.add(tsuba);return sword;
+   const tsuba=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.035,32),darkMetal());tsuba.rotation.z=Math.PI/2;tsuba.position.x=0;sword.add(tsuba);
+   // Decorative grip pegs and habaki-like collar, all hypothetical.
+   const ferrule=new THREE.Mesh(new THREE.BoxGeometry(.17,.29,.1),brassMaterial());ferrule.position.x=.18;sword.add(ferrule);
+   for(let i=0;i<4;i++){const peg=new THREE.Mesh(new THREE.SphereGeometry(.024,8,8),brassMaterial());peg.position.set(-.25-i*.18,.085,.085);sword.add(peg)}
+   return sword;
  }
  if(type==='jian'){
    const sword=addBasicSword(group,{bladeLength:3.15,bladeWidth:.35,thick:.045,curve:0,gripLength:.68,gripRadius:.07,guardWidth:.36,bladeMode:'leaf',pommel:'disc',wrap:false});
    for(let sign of [-1,1]){const lobe=new THREE.Mesh(new THREE.SphereGeometry(.075,12,12),brassMaterial());lobe.position.set(0,sign*.21,0);sword.add(lobe)}
+   const gripAccent=new THREE.Mesh(new THREE.CylinderGeometry(.082,.082,.12,20),brassMaterial());gripAccent.rotation.z=Math.PI/2;gripAccent.position.x=-.53;sword.add(gripAccent);
    return sword;
  }
  if(type==='pata'){
@@ -1273,6 +1295,7 @@ function makeSword(type){
    const shell=new THREE.Mesh(new THREE.SphereGeometry(.45,20,16,0,Math.PI*2,0,Math.PI*.6),darkMetal());shell.rotation.z=-Math.PI/2;shell.scale.set(1.5,.7,.7);shell.position.x=-.3;group.add(shell);
    const forearm=new THREE.Mesh(new THREE.CylinderGeometry(.19,.26,1.15,18,1,true),darkMetal());forearm.rotation.z=Math.PI/2;forearm.position.x=-.75;group.add(forearm);
    const flange=new THREE.Mesh(new THREE.BoxGeometry(.14,.66,.28),brassMaterial());flange.position.x=.15;group.add(flange);
+   for(let i=0;i<4;i++){const band=new THREE.Mesh(new THREE.TorusGeometry(.22,.024,8,20),brassMaterial());band.rotation.y=Math.PI/2;band.position.x=-1.13+i*.25;group.add(band)}
    group.position.x=-1;group.scale.setScalar(.88);return group;
  }
  if(type==='zulfiqar')return addBasicSword(group,{bladeLength:3.1,bladeWidth:.42,thick:.05,curve:0,gripLength:.88,guardWidth:.68,bladeMode:'broad',pommel:'round',tip:'split'}); // Conceptual forked tip, not confirmed original sword of Hz Ali.
